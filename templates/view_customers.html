@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %} Flutter_1{% endblock title %}
+
+{% block body %}
+
+<center>
+    <h1>Customers List</h1>
+
+  </center>  
+        <div class="list-group">
+
+            {% for k in data  %}
+              
+
+              <div class="card" style="width: 100%;">
+                <img src="{{ k.image.url}}" alt ="{{k.first_name}}" width="30%">
+                
+                <div class="card-body">
+                  <h5 class="card-title">{{k.first_name}}</h5>
+                  <p class="card-text">Created Date: {{k.date}}</p>
+                  <p class="card-text">City:{{k.city}}</p>
+                  <p class="card-text">Username/Email: {{k.customer_email}}</p>
+                 
+                </div>
+              </div>
+
+
+
+
+                {% endfor %}
+            </table>
+
+          
+          
+          </div>
+
+{% endblock body %}
