@@ -35,17 +35,31 @@ def flutter_3(request):
     return render(request,'flutter_3.html')
 
 
-# def getall_contacts(request): # here we fetching all contacts ( from get method) in Django DB which we can read & updat from admin
-#     #http://127.0.0.1:8000/getall_contacts/
-#     if request.method == "GET":
-#      data = list(Contact.objects.values())
+def getall_contacts(request): # here we fetching all contacts ( from get method) in Django DB which we can read & updat from admin
+    #http://127.0.0.1:8000/getall_contacts/
+    if request.method == "GET":
+     data = list(Contact.objects.values())
      
-#      return JsonResponse({'success': 200,'today': datetime.today(), 'data': data})
+     return JsonResponse({'success': 200,'today': datetime.today(), 'data': data})
      
-#     else:
-#      return "Contacts Not Found"   
+    else:
+     return "Contacts Not Found"   
  
+def get_contacts_as_json(request):
+    user_list = []
+    users = Contact.objects.all()
+    for user in users:
+        user_dict = {}
+        user_dict['email'] = user.email
+        user_dict['mobile'] = user.mobile
+        user_dict['address'] = "Static address for users"
+        
 
+        user_list.append(user_dict)
+
+    user_list = list(user_list)
+    #return JsonResponse(user_list, safe=False)
+    return JsonResponse({'success': 200,'today': datetime.today(), 'data': user_list}, safe=False)
 def getSingle_contacts(request): # here we are fetching single contact with id ( from get method) in Django DB which we can read & updat from admin
     if request.method == "GET":
      data = Contact.objects.get(email='09_jul_sonutyagi.1126@gmail.com')

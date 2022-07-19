@@ -4,7 +4,8 @@ import json
 from datetime import datetime
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from home.models import Contact
+from itsdangerous import Serializer
+from home.models import Contact, Customer, Membership, Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import (get_object_or_404,render, HttpResponseRedirect)
 
@@ -102,8 +103,12 @@ class UserContactDelete(View):# here we are deleting contact data( from api) in 
 class GetAllContacts(View):# here we are getting all the data from contact table( from api) in Django DB which we can read & updat from admin
   
     def get(self, request):
+                 
+        
+          #data=list(Contact.objects.values_list('email', flat=True))
           data = list(Contact.objects.values())
           return JsonResponse({'success': 200,'today': datetime.today(), 'data': data})
+         
        
   
 @method_decorator(csrf_exempt, name='dispatch')
@@ -112,6 +117,82 @@ class GetSinglwContact(View):# here we are getting single item from contact tabl
      def get(self, request):
          user = Contact.objects.get(email="postman_B_02Jul_sonutyagi.1126@gmail.com")
          return user.email
+        
+       
+@method_decorator(csrf_exempt, name='dispatch')
+class GetSomeDataFromContacts(View):# here we are getting single some info from the table and return as json
+  
+ def get(self, request):
+    user_list = []
+    users = Contact.objects.all()
+    for user in users:
+        user_dict = {}
+        user_dict['email'] = user.email
+        user_dict['mobile'] = user.mobile
+        user_dict['address'] = "Static address"
+        
+
+        user_list.append(user_dict)
+
+    user_list = list(user_list)
+    return JsonResponse({'success': 200,'today': datetime.today(), 'data': user_list}, safe=False)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GetDataFromMultipleTable(View):# here we are getting single some info from the table and return as json
+  
+ def get(self, request):
+    parent_list = []
+    
+    contacts_list = []
+    contacts = Contact.objects.all()
+    for user in contacts:
+        contact_dict = {}
+        contact_dict['email'] = user.email
+        contact_dict['mobile'] = user.mobile
+        contact_dict['address'] = "Static address for all users"
+        
+
+        contacts_list.append(contact_dict)
+
+    contacts_list = list(contacts_list)
+    
+    dict = {}
+    dict['title'] = "Contacts"
+    dict['list'] = contacts_list
+    parent_list.append(dict)
+    
+    
+    users_list=[]
+    users= Customer.objects.all()
+    for user in users:
+      user_dict={}
+      user_dict['first_name']=user.first_name
+      user_dict['last_name']=user.last_name
+      user_dict['customer_email']=user.customer_email
+
+      users_list.append(user_dict)
+    users_list = list(users_list)
+    dict = {}
+    dict['title'] = "Users"
+    dict['list'] = users_list
+    parent_list.append(dict)
+    
+    
+    
+    # members = list(Membership.objects.values())
+    # dict = {}
+    # dict['title'] = "Members"
+    # dict['list'] = members
+    # parent_list.append(dict)
+
+    # groups = list(Group.objects.values())
+    # dict = {}
+    # dict['title'] = "Groups"
+    # dict['list'] = groups
+    # parent_list.append(dict)
+    return JsonResponse({'success': 200,'today': datetime.today(), 'data': parent_list}, safe=False)
+   
+
         
        
   
