@@ -3,6 +3,7 @@ from django.views import View
 from django.http import HttpResponse, JsonResponse
 import json
 from datetime import datetime
+from django.core.files.storage import FileSystemStorage
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from itsdangerous import Serializer
@@ -162,6 +163,34 @@ class GetSomeDataFromContacts(View):# here we are getting single some info from 
     return JsonResponse({'success': 200,'today': datetime.today(), 'data': user_list}, safe=False)
 
 @method_decorator(csrf_exempt, name='dispatch')
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UploadCustomerWithImage(View):# 
+  
+ def upload(request):
+    if request.method == 'POST' and request.FILES['upload']:
+        first_name = request.POST.get('validationDefault01')
+        last_name = request.POST.get('validationDefault02')
+        customer_email = request.POST.get('validationDefaultUsername')
+        city = request.POST.get('validationDefault03')
+        state = request.POST.get('validationDefault04')
+        zip = request.POST.get('validationDefault05')
+        upload = request.FILES['upload']
+        fss = FileSystemStorage()
+        file = fss.save(upload.name, upload)
+        image = fss.url(file)
+            
+        customer = Customer(first_name=first_name , last_name=last_name 
+        , customer_email=customer_email , city=city, state=state , zip=zip
+        , image=image
+        , date=datetime.today())
+        customer.save()
+        return render(request, 'customer.html', {'file_url': image})
+        
+    return render(request, 'customer.html')
+@method_decorator(csrf_exempt, name='dispatch')
+
 class GetDataFromMultipleTable(View):# here we are getting single some info from the table and return as json
   
  def get(self, request):

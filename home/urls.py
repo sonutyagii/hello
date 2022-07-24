@@ -12,12 +12,12 @@ urlpatterns = [
     path("view_database", views.view_database, name='contact'),
     path("view_customers", views.view_customers, name='view_customers'),
     path("view_plants", views.view_plants, name='view_plants'),
-    
+    path("products/<int:myid>", views.ProductView, name='ProductView'),
     path("flutter_1", views.flutter_1, name='flutter_1'),
     path("flutter_2", views.flutter_2, name='flutter_2'),
     path("flutter_3", views.flutter_3, name='flutter_3'),
 
-    path('contact_save_from_postman/', UserContact.as_view()),# working
+    path('contact_save_from_postman/', UserContact.as_view()),# working 
     path('contact_update_from_postman/', UserContactUpdate.as_view()),# working
     path('contact_delete_from_postman/', UserContactDelete.as_view()),# working
     path('get_contacts/', GetAllContacts.as_view()),# 

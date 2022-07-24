@@ -49,7 +49,7 @@ class Customer(models.Model):
     state = models.CharField(max_length=20)
     zip = models.CharField(max_length=20)
     date = models.DateField()
-    # image= models.ImageField(upload_to="customers/images", default="")
+    image= models.ImageField(upload_to="customers/images", default="")
 
     def __str__(self):
      return self.first_name
@@ -167,7 +167,8 @@ class Plant(models.Model):#https://greatist.com/health/types-of-indoor-plants#sm
 
 
     def __str__(self):
-     return self.plant_name+"_"+self.plant_category
+     return self.plant_name+"_"+self.plant_category+"_"+str(self.id)
 
 #python manage.py makemigrations
 #python manage.py migrate
+#python manage.py runserver

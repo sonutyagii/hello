@@ -9,7 +9,8 @@
     <h1>Create Customer</h1>
 
   </center> 
-  <form method='post' action='/customer' class="row g-3">
+  {% comment %} <form method='post' action='/customer' class="row g-3" enctype="multipart/form-data"> {% endcomment %}
+    <form method='post' action='/customer' class="row g-3" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="col-md-4">
           <label for="validationDefault01" class="form-label">First name</label>
@@ -44,6 +45,8 @@
           <input type="text" class="form-control" id="validationDefault05" name = "validationDefault05" required>
         </div>
         <div class="col-12">
+          <input type="file" id="upload" name="upload" accept="image/*,.doc, .docx, .pdf, .txt, .png, .JPG, .HTML">
+        <br><br>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" value=""  id="invalidCheck2" required>
             <label class="form-check-label" for="invalidCheck2">
@@ -51,10 +54,12 @@
             </label>
           </div>
         </div>
+        
         <div class="col-12">
           <button class="btn btn-primary" type="submit">Submit form</button>
         </div>
       </form>
 </div>
+
 
 {% endblock body %}

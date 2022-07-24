@@ -26,8 +26,14 @@
                   <p class="card-text">{{k.plant_desc}}</p>
                   <p></span><span style="color:blue;font-weight:bold">₹ {{k.plant_price}}</span></p>
                   <p class="card-text"><small class="text-muted">Discount: ₹ {{k.plant_discount_price}}</small></p>
+                  <center> 
+                    <div class="row">
+                      <a  href="/products/{{k.id}}"><button id="qv{{k.id}}" class="btn btn-primary cart my-2">View</button></a>
+                    
+                    <button id="pr{{k.id}}" class="btn btn-primary cart">Add To Cart</button>
+                </div>
+            </center>
                   
-                  <button id="pr{{k.id}}" class="btn btn-primary cart">Add To Cart</button>
                 </div>
               </div>
             </div>
@@ -92,7 +98,8 @@ console.log(cart);
 localStorage.setItem('cart', JSON.stringify(cart));
 document.getElementById('cart').innerHTML = Object.keys(cart).length;
 });
-
+$('#popcart').popover('show');
+document.getElementById('cart')
 </script>
 
 {% endblock js  %}

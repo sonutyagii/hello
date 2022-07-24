@@ -30,7 +30,7 @@
     <title> {% block title  %}{% endblock title %} | Hello, Bootstrap!</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    {% comment %} <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
        
 
@@ -75,7 +75,7 @@
           </form>
         </div>
       </div>
-    </nav>
+    </nav> {% endcomment %}
 
    
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -120,11 +120,17 @@
               <li class="nav-item">
                 <a class="nav-link" href="/view_plants">View Plants</a>
               </li>
-              <li class="nav-item">
+              {% comment %} <li class="nav-item">
                 <a class="nav-link" href="#">Cart(<span id="cart"> 0 </span>) </a>
-              </li>
+              </li> {% endcomment %}
             </ul>
+            {% comment %} <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tooltip on bottom">
+              Cart(<span id="cart"> 0 </span>)
+            </button> {% endcomment %}
             
+            <a type="button" class="btn btn-secondary" id="popcart" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover">
+              Cart(<span id="cart"> 0 </span>)
+            </a>
           </div>
         </div>
       </nav>

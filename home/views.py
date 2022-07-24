@@ -7,6 +7,7 @@ from django.shortcuts import render , HttpResponse
 from matplotlib.style import context
 from datetime import datetime
 from django.core import serializers
+from django.core.files.storage import FileSystemStorage
 from home.models import Contact, Customer, Plant
 # Create your views here.
 
@@ -108,33 +109,40 @@ def view_database(request): # here we are fetching data from database and listin
     return render(request, 'contact_numbers.html', params)
     #return render(request, 'contact_numbers.html', context)
 
-   # first_name ,last_name  ,customer_email ,city ,state ,zip
+
+
 def customer(request): # here we are creating & saving single customer ( from fourm) in Django DB which we can read & updat from admin
-    if request.method == "POST":
+    
+    if request.method == 'POST':
+        
+        
         first_name = request.POST.get('validationDefault01')
         last_name = request.POST.get('validationDefault02')
         customer_email = request.POST.get('validationDefaultUsername')
         city = request.POST.get('validationDefault03')
         state = request.POST.get('validationDefault04')
         zip = request.POST.get('validationDefault05')
-        
-    
-    
-        #first_name = "a"
-        # last_name ="b"
-        # customer_email ="c"
-        # city = "d"
-        # state = "manual state"
-        # zip = "f"
-        
-        customer = Customer(first_name=first_name , last_name=last_name 
+
+        if len(request.FILES) != 0:
+         upload = request.FILES['upload']
+         
+         fss = FileSystemStorage()
+         file = fss.save(upload.name, upload)
+         image = fss.url(file)
+         customer = Customer(first_name=first_name , last_name=last_name 
         , customer_email=customer_email , city=city, state=state , zip=zip
+        , image=image
         , date=datetime.today())
-        customer.save()
+        else:
+         customer = Customer(first_name=first_name , last_name=last_name 
+         , customer_email=customer_email , city=city, state=state , zip=zip
+         , date=datetime.today())    
         
-    return render(request,'customer.html') 
-
-
+        customer.save()
+        return render(request, 'customer.html')
+   
+        
+    return render(request, 'customer.html')
 def view_customers(request): # here we are fetching data from database and listing on html page
     if request.method == "GET":
         data = Customer.objects.all()
@@ -150,3 +158,20 @@ def view_plants(request): # here we are fetching data from database and listing 
         params = {'data': data}
 
     return render(request, 'plants_listing.html', params)
+
+def view_customers(request): # here we are fetching data from database and listing on html page
+    if request.method == "GET":
+        data = Customer.objects.all()
+       
+        params = {'data': data}
+
+    return render(request, 'view_customers.html', params)
+
+def ProductView(request,myid): # here we are fetching data from database and listing on html page
+
+    product = Plant.objects.filter(id=myid)
+       
+    print(product)
+    params = {'product': product[0]}
+
+    return render(request, 'shoap/product_view.html',params)
