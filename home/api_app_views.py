@@ -1,3 +1,4 @@
+import socket
 from django.views import View
 from django.http import HttpResponse, JsonResponse
 import json
@@ -21,8 +22,6 @@ class UserContact(View):# here we are saving contact data( from api) in Django D
 # }
     
     def post(self, request):
-
-
          data = json.loads(request.body.decode("utf-8"))
          email = data.get('email')
          address = data.get('address')
@@ -58,12 +57,14 @@ class UserContactUpdate(View):# here we are updating contact data( from api) in 
     
     def post(self, request):
          data = json.loads(request.body.decode("utf-8"))
+         mobile = data.get('mobile')
+         username = data.get('username')
          email = data.get('email')
          address = data.get('address')
          somthing_else = data.get('somthing_else')
          date = data.get('date')
         
-         Contact.objects.filter(email=email).update(address=address,somthing_else=somthing_else,date=date)
+         Contact.objects.filter(email=email).update(username=username,mobile=mobile,address=address,somthing_else=somthing_else,date=date)
          
          data = {
             "message": f"Item updated "
@@ -114,9 +115,32 @@ class GetAllContacts(View):# here we are getting all the data from contact table
 @method_decorator(csrf_exempt, name='dispatch')
 class GetSinglwContact(View):# here we are getting single item from contact table( from api) in Django DB which we can read & updat from admin
   
-     def get(self, request):
-         user = Contact.objects.get(email="postman_B_02Jul_sonutyagi.1126@gmail.com")
-         return user.email
+     def post(self, request):
+         data = json.loads(request.body.decode("utf-8"))
+        
+         userInput = data.get('email')
+                
+         try:
+             
+             singleitem= list(Contact.objects.filter(email=userInput).values())
+             
+             if(len(singleitem)==0):# data not found in db using email now trying with username
+              
+              singleitem= list(Contact.objects.filter(username=userInput).values())
+             
+              if(len(singleitem)==0):
+                 
+                 return JsonResponse({'success': 404,'msg': "User Not Found",'today': datetime.today(), 'data': []}, safe=False)
+              else:
+                return JsonResponse({'success': 200,'msg': "User Found",'today': datetime.today(), 'data': singleitem})
+
+             else:
+                   return JsonResponse({'success': 200,'msg': "User Found",'today': datetime.today(), 'data': singleitem})
+
+      
+         except  Contact.DoesNotExist:
+             return JsonResponse({'success': 404,'msg': "User Not Found",'today': datetime.today(), 'data': []}, safe=False)
+         
         
        
 @method_decorator(csrf_exempt, name='dispatch')
@@ -141,15 +165,16 @@ class GetSomeDataFromContacts(View):# here we are getting single some info from 
 class GetDataFromMultipleTable(View):# here we are getting single some info from the table and return as json
   
  def get(self, request):
-    parent_list = []
     
+  try:  
+    parent_list = []
     contacts_list = []
     contacts = Contact.objects.all()
     for user in contacts:
         contact_dict = {}
-        contact_dict['email'] = user.email
-        contact_dict['mobile'] = user.mobile
-        contact_dict['address'] = "Static address for all users"
+        contact_dict['id'] = user.email_
+        contact_dict['display_name'] = user.mobile
+        contact_dict['course_image_url'] = "http://52.23.47.201/asset-v1:EDL-UST+EDL_ALP_2021+Sem1_2122+type@asset+block@asset-v1_EDL-UST_EDL_ALP_21_Sem1_2122_type_asset_block_%D9%84%D8%BA%D9%80%D9%80%D8%A9_%D8%B9%D9%80%D9%80%D9%80%D9%80%D8%B1%D8%A8%D9%8A%D8%A9.jpg"
         
 
         contacts_list.append(contact_dict)
@@ -157,8 +182,9 @@ class GetDataFromMultipleTable(View):# here we are getting single some info from
     contacts_list = list(contacts_list)
     
     dict = {}
-    dict['title'] = "Contacts"
-    dict['list'] = contacts_list
+    dict['category_name'] = "Contacts"
+    dict['category_id'] = 1
+    dict['course_category_name'] = contacts_list
     parent_list.append(dict)
     
     
@@ -166,18 +192,25 @@ class GetDataFromMultipleTable(View):# here we are getting single some info from
     users= Customer.objects.all()
     for user in users:
       user_dict={}
-      user_dict['first_name']=user.first_name
-      user_dict['last_name']=user.last_name
-      user_dict['customer_email']=user.customer_email
+      user_dict['id']=user.first_name
+      user_dict['display_name']=user.last_name
+      user_dict['course_image_url']="http://52.23.47.201/asset-v1:EDL-UST+EDL_ALP_2021+Sem1_2122+type@asset+block@asset-v1_EDL-UST_EDL_ALP_21_Sem1_2122_type_asset_block_%D9%84%D8%BA%D9%80%D9%80%D8%A9_%D8%B9%D9%80%D9%80%D9%80%D9%80%D8%B1%D8%A8%D9%8A%D8%A9.jpg"
 
       users_list.append(user_dict)
     users_list = list(users_list)
     dict = {}
-    dict['title'] = "Users"
-    dict['list'] = users_list
+    dict['category_name'] = "Contacts 2"
+    dict['category_id'] = 2
+    dict['course_category_name'] = users_list
     parent_list.append(dict)
-    
-    
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)   
+    print("Your Computer Name is:" + hostname)   
+    print("Your Computer IP Address is:" + IPAddr)
+    #http://192.168.168.116/
+    #http://192.168.168.116:8000/auth/local/register
+    #http://192.168.168.116:8000/
+    #http://192.168.168.141:5555/get_data_from_multiple_tables/
     
     # members = list(Membership.objects.values())
     # dict = {}
@@ -190,9 +223,12 @@ class GetDataFromMultipleTable(View):# here we are getting single some info from
     # dict['title'] = "Groups"
     # dict['list'] = groups
     # parent_list.append(dict)
-    return JsonResponse({'success': 200,'today': datetime.today(), 'data': parent_list}, safe=False)
+    return JsonResponse({'success': 200,'today': datetime.today(),'error_msg': "", 'data': parent_list}, safe=False)
    
-
+  except Exception as e:
+    parent_list = []
+    return JsonResponse({'success': 400,'error_msgs': str(e.args), 'data':  []}, safe=False)
         
+
        
   

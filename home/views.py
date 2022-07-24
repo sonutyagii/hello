@@ -7,16 +7,20 @@ from django.shortcuts import render , HttpResponse
 from matplotlib.style import context
 from datetime import datetime
 from django.core import serializers
-from home.models import Contact, Customer
+from home.models import Contact, Customer, Plant
 # Create your views here.
 
 def index(request):
-    # here context is the dict to send the data to template. we will use this for fetching data from db 
-    context = {
-        "variable":"my first variable"
-    }
-    return render(request,'index.html' , context)
-    # return HttpResponse('this is home page')
+    if request.method == "GET":
+        data = Plant.objects.all()
+        params = {'data': data}
+
+    return render(request, 'plants_listing.html', params)
+    # context = {
+    #     "variable":"my first variable"
+    # }
+    # return render(request,'index.html' , context)
+   
 
 
 def about(request):
@@ -46,23 +50,33 @@ def getall_contacts(request): # here we fetching all contacts ( from get method)
      return "Contacts Not Found"   
  
 def get_contacts_as_json(request):
-    user_list = []
-    users = Contact.objects.all()
-    for user in users:
-        user_dict = {}
-        user_dict['email'] = user.email
-        user_dict['mobile'] = user.mobile
-        user_dict['address'] = "Static address for users"
+    try:
+     email = str(request.POST['email'])
+     user = Contact.objects.get(email=email)
+     return JsonResponse({'success': 404,'today': datetime.today(), 'data': user}, safe=False)
+    except  Contact.DoesNotExist:
+        
+     return JsonResponse({'success': 404,'today': datetime.today(), 'data': []}, safe=False)
+
+    
+    # user_list = []
+    # users = Contact.objects.all()
+    # for user in users:
+    #     user_dict = {}
+    #     user_dict['email'] = user.email
+    #     user_dict['mobile'] = user.mobile
+    #     user_dict['address'] = "Static address for users"
         
 
-        user_list.append(user_dict)
+    #     user_list.append(user_dict)
 
-    user_list = list(user_list)
-    #return JsonResponse(user_list, safe=False)
-    return JsonResponse({'success': 200,'today': datetime.today(), 'data': user_list}, safe=False)
+    # user_list = list(user_list)
+    # #return JsonResponse(user_list, safe=False)
+    # return JsonResponse({'success': 200,'today': datetime.today(), 'data': user_list}, safe=False)
+
 def getSingle_contacts(request): # here we are fetching single contact with id ( from get method) in Django DB which we can read & updat from admin
     if request.method == "GET":
-     data = Contact.objects.get(email='09_jul_sonutyagi.1126@gmail.com')
+     data = Contact.objects.get(email='test001sonutyagi.1126@gmail.com')
      
      return data
      
@@ -128,3 +142,11 @@ def view_customers(request): # here we are fetching data from database and listi
         params = {'data': data}
 
     return render(request, 'view_customers.html', params)
+
+def view_plants(request): # here we are fetching data from database and listing on html page
+    if request.method == "GET":
+        data = Plant.objects.all()
+       
+        params = {'data': data}
+
+    return render(request, 'plants_listing.html', params)

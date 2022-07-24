@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %} Flutter_1{% endblock title %}
+
+{% block body %}
+
+<center>
+    <h1>Plants</h1>
+
+  </center>  
+  <div class='container-fluid my-2'>
+  <div class="row row-cols-1 row-cols-md-4 g-4">
+    
+    {% for k in data  %}
+                
+    <div class="col">
+
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img src="{{ k.plant_image.url}}" class="img-fluid rounded-start" {vertical-align:text-bottom}>
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{k.plant_name}}</h5>
+                  <p class="card-text">{{k.plant_desc}}</p>
+                  <p></span><span style="color:blue;font-weight:bold">₹ {{k.plant_price}}</span></p>
+                  <p class="card-text"><small class="text-muted">Discount: ₹ {{k.plant_discount_price}}</small></p>
+                  
+                  <button id="pr{{k.id}}" class="btn btn-primary cart">Add To Cart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% comment %} <div class="card bg-dark text-white">
+            <img src="{{ k.plant_image.url}}" class="card-img" alt="...">
+            <div class="card-img-overlay">
+              <h5 class="card-title">Card title</h5>
+              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              <p class="card-text">Last updated 3 mins ago</p>
+            </div>
+          </div> {% endcomment %}
+        {% comment %} <div class="card">
+
+            
+          <img src="{{ k.plant_image.url}}" class="card-img-top-center" "{{k.plant_name}}" width="260" height="345">
+          <div class="card-body">
+            <h5 class="card-title">{{k.plant_name}}</h5>
+            <p></span><span style="color:blue;font-weight:bold">₹ {{k.plant_price}}</span></p>
+            <p class="card-text"><small class="text-muted">Discount: ₹ {{k.plant_discount_price}}</small></p>
+            <button id="pr{{k.id}}" class="btn btn-primary cart">add to Cart</button>
+            <a href="#" class="card-link">   View details</a>
+        </div> {% endcomment %}
+    {% comment %} </div> {% endcomment %}
+  </div>
+     
+
+      {% endfor %}
+      
+{% endblock body %}
+
+{% block js  %}
+<script>
+
+console.log('working_b');
+{% comment %} localStorage.clear(); {% endcomment %}
+{% comment %} localStorage.removeItem(key); {% endcomment %}
+if(localStorage.getItem('cart')==null){
+    var cart = {};
+}
+else{
+
+    cart = JSON.parse(localStorage.getItem('cart'));
+    document.getElementById('cart').innerHTML = Object.keys(cart).length;
+}
+
+
+$('.cart').click(function(){
+console.log('clicked');
+var idstr = this.id.toString();
+console.log(idstr);
+if(cart[idstr]!=undefined){
+    cart[idstr]=cart[idstr]+1;
+
+}
+else{
+    cart[idstr]=1;
+}
+
+console.log(cart);
+localStorage.setItem('cart', JSON.stringify(cart));
+document.getElementById('cart').innerHTML = Object.keys(cart).length;
+});
+
+</script>
+
+{% endblock js  %}
+
+{% comment %} https://www.youtube.com/watch?v=3HbVQxwT29w    15 minutes cut{% endcomment %} python manage.py

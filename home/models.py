@@ -24,16 +24,19 @@ def upload_image(self, filename):
 # Create contact
 class Contact(models.Model):
     id = models.AutoField(primary_key=True)
+    username = models.CharField(max_length=20, default="")
     email = models.CharField(max_length=50,validators =[validate_geeks_mail])
     mobile = models.CharField(max_length=20, default='00') # when adding a new field into a model set the default value
     address = models.CharField(max_length=200)
     somthing_else = models.TextField()
     date = models.DateField()
-    image= models.ImageField(upload_to="contacts/images", default="")
+    #image= models.ImageField(upload_to="contacts/images", default="")
 
 
     def __str__(self):
      return self.email
+
+
 
 
 # Create customer item
@@ -46,13 +49,21 @@ class Customer(models.Model):
     state = models.CharField(max_length=20)
     zip = models.CharField(max_length=20)
     date = models.DateField()
-    image= models.ImageField(upload_to="customers/images", default="")
+    # image= models.ImageField(upload_to="customers/images", default="")
 
     def __str__(self):
      return self.first_name
 
 
-
+# {
+#  	"first_name": "22july_sonutyagi.1126@gmail.com",
+#     "last_name": "22july_sonutyagi.1126@gmail.com",
+#  	"customer_email": "4",
+#  	"city": "postman desc from postman id 4 ",
+#      "state": "postman desc from postman id 4 ",
+#      "zip": "postman desc from postman id 4 ",
+#  	"date": "2021-12-31"
+#  }
 
 class Musician(models.Model):
     InstrumentType = models.TextChoices('Instrument', 'Guitar Violin Drums')
@@ -125,5 +136,38 @@ class Membership(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     date_joined = models.DateField()
     invite_reason = models.CharField(max_length=64)
+
+
+
+
+
+# Create contact
+class Plant(models.Model):#https://greatist.com/health/types-of-indoor-plants#small-indoor-plants
+    plants_name  = (
+        ('Money tree (Pachira aquatica)', 'Money tree (Pachira aquatica)'),
+        ('Fiddle leaf fig (Ficus lyrata)', 'Fiddle leaf fig (Ficus lyrata)'),
+        ('Rubber plant (Ficus elastica)', 'Rubber plant (Ficus elastica)'),#
+        ('Giant bird of paradise (Strelitzia nicolai)', 'Giant bird of paradise (Strelitzia nicolai)'),
+        ('Monstera (Monstera deliciosa)', 'Monstera (Monstera deliciosa)')
+    )
+    availablety  = (('Yes', 'Yes'),('No', 'No'))
+    indoor_outdoor  = (('Indoor', 'Indoor'),('Outdoor', 'Outdoor'),('B', 'Both'))
+    plant_category = models.CharField(max_length=50, choices=indoor_outdoor)
+    id = models.AutoField(primary_key=True)
+    plant_name = models.CharField(max_length=50, choices=plants_name, default="")
+    plant_available = models.CharField(max_length=50, choices=availablety, default="No")
+    plant_subcategory = models.CharField(max_length=50, choices=indoor_outdoor)
+    plant_age = models.CharField(max_length=200)
+    plant_desc = models.CharField(max_length=500, default="")
+    plant_price= models.DecimalField(max_digits=10, decimal_places=2, default="")
+    plant_discount_price= models.DecimalField(max_digits=10, decimal_places=2, default="0.0")
+    plant_stars = models.IntegerField( default="0")
+    date = models.DateField()
+    plant_image= models.ImageField(upload_to="plants/images", default="")
+
+
+    def __str__(self):
+     return self.plant_name+"_"+self.plant_category
+
 #python manage.py makemigrations
 #python manage.py migrate

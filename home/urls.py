@@ -10,8 +10,8 @@ urlpatterns = [
     path("contact", views.contact, name='contact'),
     path("customer", views.customer, name='customer'),
     path("view_database", views.view_database, name='contact'),
-    
     path("view_customers", views.view_customers, name='view_customers'),
+    path("view_plants", views.view_plants, name='view_plants'),
     
     path("flutter_1", views.flutter_1, name='flutter_1'),
     path("flutter_2", views.flutter_2, name='flutter_2'),
@@ -22,7 +22,7 @@ urlpatterns = [
     path('contact_delete_from_postman/', UserContactDelete.as_view()),# working
     path('get_contacts/', GetAllContacts.as_view()),# 
     path('get_someinfo_from_contact/', GetSomeDataFromContacts.as_view()),# 
-    path('get_data_from_multiple_tables_contact/', GetDataFromMultipleTable.as_view()),# 
+    path('get_data_from_multiple_tables/', GetDataFromMultipleTable.as_view()),# 
     path('get_contact/', GetSinglwContact.as_view()),# 
    
     path("get_contacts_as_json", views.get_contacts_as_json, name='get_contacts_as_json'),# we are getting 2 values only from model
