@@ -7,8 +7,10 @@ from django.shortcuts import render , HttpResponse
 from matplotlib.style import context
 from datetime import datetime
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
 from django.core.files.storage import FileSystemStorage
-from home.models import Contact, Customer, Plant
+from home.models import Contact, ContactSerializer, Customer, Plant
 # Create your views here.
 
 def index(request):
@@ -97,6 +99,50 @@ def contact(request): # here we are creating & saving single contact ( from four
         
     return render(request,'contact.html') 
     
+
+@csrf_exempt
+def retrieve_update_delete_using_serializare(request):#http://127.0.0.1:8000/contact_update_using_serializare/38/
+    """
+    http://127.0.0.1:8000/retrieve_update_delete_using_serializer/?email=24july_01_sonutyagi.1126@gmail.com
+    Retrieve, update or delete a Contact.
+    """
+
+    if request.method == 'GET':
+     try:
+        email = request.GET.get('email')
+        contact = Contact.objects.get(email=email)
+     except Contact.DoesNotExist:       
+        return JsonResponse({'success': 404, 'msg': "DoesNotExist", "data":None})
+        
+     serializer = ContactSerializer(contact)
+     return JsonResponse({'success': 200, 'msg': "Exist", "data":serializer.data})
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ContactSerializer(contact, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse({'success': 404, 'msg': "Can not put(save)"})
+
+    elif request.method == 'DELETE':
+        contact.delete()
+        return JsonResponse({'success': 204, 'msg': "deleted"})
+
+@csrf_exempt
+def retrieve_single_obj_using_serializer(request,id):#
+    """
+    http://127.0.0.1:8000/retrieve_single_obj_using_serializer/38
+    get single Contact.
+    """
+    try:
+    
+        contact = Contact.objects.get(id=id)
+        serializer = ContactSerializer(contact)
+        return JsonResponse({'success': 200, 'msg': "Exist", "data":serializer.data})
+    except Contact.DoesNotExist:
+        
+        return JsonResponse({'success': 404, 'msg': "DoesNotExist", "data":None})
 
 def view_database(request): # here we are fetching data from database and listing on html page
     if request.method == "GET":

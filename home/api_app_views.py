@@ -7,8 +7,10 @@ from django.core.files.storage import FileSystemStorage
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from itsdangerous import Serializer
-from home.models import Contact, Customer, Membership, Group
+from home.models import Contact, ContactSerializer, Customer, Membership, Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import serializers
+from rest_framework.parsers import JSONParser
 from django.shortcuts import (get_object_or_404,render, HttpResponseRedirect)
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -105,17 +107,30 @@ class UserContactDelete(View):# here we are deleting contact data( from api) in 
 class GetAllContacts(View):# here we are getting all the data from contact table( from api) in Django DB which we can read & updat from admin
   
     def get(self, request):
-                 
-        
-          #data=list(Contact.objects.values_list('email', flat=True))
           data = list(Contact.objects.values())
           return JsonResponse({'success': 200,'today': datetime.today(), 'data': data})
+          
          
+@method_decorator(csrf_exempt, name='dispatch') #https://www.django-rest-framework.org/tutorial/1-serialization/
+class GetAllContactsUsingSerializer(View):# here we are getting all the data from contact table( from api) in Django DB which we can read & updat from admin
+  
+    def get(self, request):
+      if request.method == 'GET':
+          serializer = ContactSerializer(Contact.objects.all(), many=True)
+          #return JsonResponse({'success': 200,'today': datetime.today(), 'data': serializer.data})
+          data = serializer.data
+          
+          return JsonResponse(serializer.data, safe=False)
        
-  
+
+
 @method_decorator(csrf_exempt, name='dispatch')
-class GetSinglwContact(View):# here we are getting single item from contact table( from api) in Django DB which we can read & updat from admin
+class GetSinglContactWithEmailOrUsername(View):# here we are getting single item from contact table( from api) in Django DB which we can read & updat from admin
   
+  # run below code from postman row
+#     {
+# "email": "abc@gmail.com"
+# }
      def post(self, request):
          data = json.loads(request.body.decode("utf-8"))
         
@@ -125,27 +140,38 @@ class GetSinglwContact(View):# here we are getting single item from contact tabl
              
              singleitem= list(Contact.objects.filter(email=userInput).values())
              
-             if(len(singleitem)==0):# data not found in db using email now trying with username
+             if(len(singleitem)==0):# data not found in db with email . now trying with username
               
               singleitem= list(Contact.objects.filter(username=userInput).values())
              
-              if(len(singleitem)==0):
+              if(len(singleitem)==0):# data not found in db with username . now trying with mobile
+
+                 singleitem= list(Contact.objects.filter(mobile=userInput).values())
                  
-                 return JsonResponse({'success': 404,'msg': "User Not Found",'today': datetime.today(), 'data': []}, safe=False)
+                 if(len(singleitem)==0):
+                  return JsonResponse({'success': 202,'msg': "User Not Found",'today': datetime.today(), 'data': []}, safe=False)
+
+                 else:
+                    
+                    return JsonResponse({'success': 200,'msg': "Exist with Mobile",'today': datetime.today(), 'data': singleitem})
+
               else:
-                return JsonResponse({'success': 200,'msg': "User Found",'today': datetime.today(), 'data': singleitem})
+                return JsonResponse({'success': 200,'msg': "Exist with username",'today': datetime.today(), 'data': singleitem})
 
              else:
-                   return JsonResponse({'success': 200,'msg': "User Found",'today': datetime.today(), 'data': singleitem})
+                   return JsonResponse({'success': 200,'msg': "Exist with email",'today': datetime.today(), 'data': singleitem})
 
       
          except  Contact.DoesNotExist:
-             return JsonResponse({'success': 404,'msg': "User Not Found",'today': datetime.today(), 'data': []}, safe=False)
+             return JsonResponse({'success': 404,'msg': "User Not Exist",'today': datetime.today(), 'data': []}, safe=False)
          
-        
+
+
+
+
        
 @method_decorator(csrf_exempt, name='dispatch')
-class GetSomeDataFromContacts(View):# here we are getting single some info from the table and return as json
+class GetAllContactsFromDbAndReturnSomeInfo(View):# here we are getting single some info from the table and return as json
   
  def get(self, request):
     user_list = []
@@ -260,4 +286,3 @@ class GetDataFromMultipleTable(View):# here we are getting single some info from
         
 
        
-  

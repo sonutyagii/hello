@@ -3,7 +3,7 @@ from django.db import models
 from django.forms import ValidationError
 from flask import Response
 from itsdangerous import Serializer
-
+from rest_framework import serializers
 
 
 # creating a validator function
@@ -36,7 +36,35 @@ class Contact(models.Model):
     def __str__(self):
      return self.email
 
+class ContactSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    email = serializers.CharField(required=False)
+    mobile = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
+    somthing_else = serializers.CharField(required=False)
+    date = serializers.CharField(required=False)
+    
 
+    def create(self, validated_data):
+        """
+        Create and return a new `Contact` instance, given the validated data.
+        """
+        return Contact.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Update and return an existing `Contact` instance, given the validated data.
+        """
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.mobile = validated_data.get('mobile', instance.mobile)
+        instance.language = validated_data.get('language', instance.language)
+        instance.address = validated_data.get('address', instance.address)
+        instance.somthing_else = validated_data.get('somthing_else', instance.somthing_else)
+        instance.date = validated_data.get('date', models.DateField())
+        instance.save()
+        return instance
 
 
 # Create customer item
